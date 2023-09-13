@@ -1,4 +1,5 @@
 const httpStatusCode  = require('../constants/httpStatusCode');
+const {validationResult} = require('express-validator');
 const { JWT_KEY } = require('../constants/apiConsts');
 const HttpError = require("../models/httpError");
 const User = require('../models/User');
@@ -6,15 +7,28 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const registerUser = async (req, res, next) => {
-    const { email, password } = req.body;
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()) {
+        next(new HttpError('The passed inputs are wrong, please check the data', httpStatusCode.UNPROCESSABLED));
+    }
+
+    let user;
+    const { name, email, password, image } = req.body;
     const existUser = await User.findOne({ where: { email } });
 
     if(existUser) return next(new HttpError('An user with that email exist',httpStatusCode.UNPROCESSABLED));
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, password: hashedPassword });
+    try {
+        user = await User.create({ name, image: req.file.path, email, password: hashedPassword });    
+    } catch (error) {
+        console.log(error);
+        return next( new HttpError('Error creating user', httpStatusCode.INTERNAL_SERVER_ERROR));
+    }
+    
     const token = generateToken(user);
-    res.status(httpStatusCode.OK).json({ user: { id: user.id, email:user.email}, token });
+    res.status(httpStatusCode.OK).json({ user: { userId: user.id, email:user.email, name: user.name}, token });
 };
 
 const loginUser = async (req, res, next) => {
@@ -23,7 +37,7 @@ const loginUser = async (req, res, next) => {
     if (!user || !(await bcrypt.compare(password, user.password))) return next(new HttpError('Loggin  failed, invalid credentials please try again.!',httpStatusCode.INTERNAL_SERVER_ERROR))
 
     const token = generateToken(user);
-    res.status(httpStatusCode.OK).json({ user: { id: user.id, email:user.email}, token });
+    res.status(httpStatusCode.OK).json({ user: { userId: user.id, email:user.email, name: user.name}, token });
 };
 
 const generateToken = (user) => {

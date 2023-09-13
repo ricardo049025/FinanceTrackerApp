@@ -2,6 +2,6 @@
     "env":{
         "DB_NAME": "NSDBAPPTracking",
         "JWT_KEY": "NS_APP_TRACKING_JWT",
-        "PORT": 3000
+        "PORT": 5001
     }
 }

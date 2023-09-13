@@ -1,18 +1,22 @@
 // load all the modules to use 
 const transactionRoutes = require('./routes/transactionRoutes');
-const { PORTAPI} = require('./constants/apiConsts');
 const authRoutes = require('./routes/authRoutes');
 const HttpError = require('./models/httpError');
 const sequelize = require('./config/database');
+const env = require('./constants/apiConsts');
 const bodyParse = require('body-parser');
 const express = require('express');
 const cors = require('cors');
-
+const path = require("path");
+const fs = require('fs');
 
 const app = express();
 
 //Using: body parse
 app.use(bodyParse.json());
+
+//middleware to handle the path of the uploaded images
+app.use('./uploads/images',express.static(path.join("uploads","images")));
 
 //Allowing cors from other server
 app.use(cors());
@@ -35,6 +39,9 @@ app.use((req,rest,next) =>{
 
 //Middleware to handler the errors in the routes
 app.use((error, req, res, next)=>{
+    if(req.file) fs.unlink(req.file.path, () =>{});
+    if(res.headerSent) return next(error);
+
     res.status(error.code || 500);
     res.json({message: error.message || 'An unknow error has ocurred !.'});
 })
@@ -42,8 +49,8 @@ app.use((error, req, res, next)=>{
 sequelize.sync({ force: false })
         .then(() => {
             console.log('Database connected !!');
-            app.listen(PORTAPI || 3000, () =>{
-                console.log(`Server is running on port ${PORTAPI}`);
+            app.listen(env.PORTAPI || 3000, () =>{
+                console.log(`Server is running on port ${env.PORTAPI}`);
             })
         })
         .catch( error => {
