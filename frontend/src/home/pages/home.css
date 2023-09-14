@@ -7,5 +7,5 @@
 .dasboard-graph {
   display: flex;
   flex-wrap: wrap;
-  justify-content: ;
+  justify-content: start;
 }

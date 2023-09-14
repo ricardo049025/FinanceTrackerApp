@@ -3,6 +3,7 @@ import LoadingSpinner from "./shared/Components/UIElements/LoadingSpinner";
 import MainNavigation from "./shared/Components/Navigation/MainNavigation";
 import { AuthContext } from "./shared/Components/Context/auth-context";
 import { useAuth } from "./shared/Components/hooks/auth-hook";
+import Transaction from "./transactions/pages/Transaction";
 import Home from "./home/pages/Home";
 import Auth from "./users/pages/Auth";
 import React, {Suspense} from "react";
@@ -10,9 +11,10 @@ import React, {Suspense} from "react";
 const App = () => {
   const {token, login, logout, userId, name} = useAuth();
   let routes;
-
+  console.log(token);
   if(token){
     routes = (<Switch>
+                <Route path="/transactions" ><Transaction/></Route>
                 <Route path="/" > <Home/></Route>
                 <Redirect to="/"/>
               </Switch>);

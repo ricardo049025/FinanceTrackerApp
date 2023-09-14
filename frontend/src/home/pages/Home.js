@@ -8,6 +8,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import ChartComponent from '../components/ChartComponent';
 import Boxmenu from  '../components/Boxmenu';
 import './home.css';
+import Transaction from '../../transactions/pages/Transaction';
 
 const Home = () => {
     const { isLoading, error, sendRequest, clearError } = useHttpClient();
@@ -75,6 +76,7 @@ const Home = () => {
 
                 <div className="dasboard-graph">
                     <ChartComponent title={`Montly Finances - ${ new Date().getFullYear()}`} labels={labels} Incomes={montlyIncomes} expenses={montlyExpenses} /> 
+                    <Transaction />
                 </div>
             </div>
             
