@@ -11,7 +11,12 @@ const getAllTransactions = async(req, res, next) => {
     const userId = req.userData.userId;
     const transactions = await Transaction.findAll({where: {userId}})
     if (!transactions || transactions?.length === 0) return next( new HttpError('No transactions found !!', httpStatusCode.NOT_FOUND));
-    res.status(httpStatusCode.OK).json({transactions});
+    const mappedTransactions = transactions.map((item) => {
+        item.isIncome = item.isIncome ? 'Income' : 'Expense'
+        item.createdAt = helper.formatDateToYYYMMDD(item.createdAt);
+        return item;
+    }) 
+    res.status(httpStatusCode.OK).json(mappedTransactions);
 };
 
 const getMontlyTransactionIncomes = async(req, res, next) => {
@@ -41,8 +46,9 @@ const getMontlyTransactionExpenses = async(req, res, next) => {
 };
 
 const getTransactionById = async(req, res, next) => {
+    const userId = req.userData.userId;
     const transactionId =  req.params.transactionId;
-    const transaction = await Transaction.findOne({ where: { id: transactionId}});
+    const transaction = await Transaction.findOne({ where: { id: transactionId, userId}});
     if(!transaction) return next(new HttpError('Transaction not found', httpStatusCode.NOT_FOUND));
     res.status(httpStatusCode.OK).json({transaction});
 }
@@ -64,6 +70,8 @@ const getSummaryTransactions = async(req, res, next) =>{
 const createTransaction = async (req, res, next ) => {
     const {description, amount, isIncome} = req.body;
     const userId = req.userData.userId;
+    console.log("number:");
+    console.log(amount);
     if(!helper.isNumber(amount)) return next(new HttpError('the amount field must be a number', httpStatusCode.UNPROCESSABLED ))
     try {
         const transaction = await Transaction.create({ description, amount, isIncome, userId});  
@@ -98,10 +106,11 @@ const updateTransaction = async (req, res, next) => {
 }
 
 const deleteTransaction = async (req, res, next) => {
+    const userId = req.userData.userId;
     const transactionId = req.params.transactionId;
     if(!helper.isNumber(transactionId)) return next(new HttpError('the transaction id must be a number', httpStatusCode.UNPROCESSABLED ))
 
-    const transaction = await Transaction.findOne({where: {id: transactionId}});
+    const transaction = await Transaction.findOne({where: {id: transactionId, userId}});
     if (!transaction) return next(new HttpError('Transaction to delete not found !!', httpStatusCode.NOT_FOUND));
 
     try{
