@@ -1,0 +1,11 @@
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+.dasboard-graph {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: ;
+}

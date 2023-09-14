@@ -7,6 +7,8 @@ router.use(authenticateUser);
 router.get('/',transactionController.getAllTransactions);
 router.get('/:transactionId',transactionController.getTransactionById);
 router.get('/user/summary',transactionController.getSummaryTransactions);
+router.get('/user/montlyIncomes',transactionController.getMontlyTransactionIncomes);
+router.get('/user/montlyExpenses',transactionController.getMontlyTransactionExpenses);
 router.post('/',transactionController.createTransaction);
 router.patch('/:transactionId', transactionController.updateTransaction);
 router.delete('/:transactionId', transactionController.deleteTransaction);
