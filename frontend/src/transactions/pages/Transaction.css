@@ -18,10 +18,10 @@
   border-radius: 4px;
 }
 
-.btn-custom.btn-info {
+.btn-custom.btn-danger {
   color: #fff;
-  background-color: #5bc0de; /* Bootstrap's info button color */
-  border-color: #46b8da; /* Bootstrap's info button border color */
+  background-color: #ff6f6f; /* Bootstrap's info button color */
+  border-color: #fc7a7a; /* Bootstrap's info button border color */
 }
 
 .btn-custom.btn-warning {
