@@ -22,7 +22,6 @@ const ChartComponent = ({ title, labels, Incomes, expenses}) => {
       },
     ],
   }
-  console.log(Incomes);
 
   return (
     <React.Fragment>

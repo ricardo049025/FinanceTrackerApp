@@ -1,0 +1,31 @@
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    
+  }
+
+  /* Custom styles to make buttons look like Bootstrap buttons */
+.btn-custom {
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.btn-custom.btn-info {
+  color: #fff;
+  background-color: #5bc0de; /* Bootstrap's info button color */
+  border-color: #46b8da; /* Bootstrap's info button border color */
+}
+
+.btn-custom.btn-warning {
+  color: #fff;
+  background-color: #f0ad4e; /* Bootstrap's warning button color */
+  border-color: #eea236; /* Bootstrap's warning button border color */
+}
