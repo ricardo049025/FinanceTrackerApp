@@ -3,7 +3,7 @@ import LoadingSpinner from "./shared/Components/UIElements/LoadingSpinner";
 import MainNavigation from "./shared/Components/Navigation/MainNavigation";
 import { AuthContext } from "./shared/Components/Context/auth-context";
 import { useAuth } from "./shared/Components/hooks/auth-hook";
-import Transaction from "./transactions/pages/Transaction";
+import NewTransaction from "./transactions/pages/NewTransaction";
 import Home from "./home/pages/Home";
 import Auth from "./users/pages/Auth";
 import React, {Suspense} from "react";
@@ -14,13 +14,13 @@ const App = () => {
   console.log(token);
   if(token){
     routes = (<Switch>
-                <Route path="/transactions" ><Transaction/></Route>
+                <Route path="/transaction" exact><NewTransaction/></Route>
                 <Route path="/" > <Home/></Route>
                 <Redirect to="/"/>
               </Switch>);
   } else{
     routes = ( <Switch>
-                <Route path="/auth" > <Auth /> </Route>
+                <Route path="/auth" exact> <Auth /> </Route>
                 <Redirect to="/auth"/>
               </Switch>
               );

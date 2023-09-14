@@ -3,6 +3,8 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 import Mydatatable from '../../shared/Components/UIElements/Mydatatable';
 import { useHttpClient } from "../../shared/Components/hooks/http-hook";
 import ErrorModal from "../../shared/Components/UIElements/ErrorModal";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashAlt} from '@fortawesome/free-solid-svg-icons'
 import React, { useEffect, useState, useContext } from 'react';
 import { format } from 'date-fns';
 import './Transaction.css';
@@ -15,27 +17,27 @@ const Transaction = () => {
     const colums = [
         {
             name: 'ID',
-            selector: 'id',
+            selector: (row,i) => row.id,
             sortable: true,
         },
         {
             name: 'DESCRIPTION',
-            selector: 'description',
+            selector: (row,i) => row.description,
             sortable: true,
         },
         {
             name: 'Amount ($)',
-            selector: 'amount',
+            selector: (row,i) => row.amount,
             sortable: true,
         },
         {
             name: 'Transaction Type',
-            selector: 'isIncome',
+            selector: (row,i) => row.isIncome,
             sortable: true,
         },
         {
             name: 'Transaction Date',
-            selector: 'createdAt',
+            selector: (row,i) => row.createdAt,
             sortable: true,
             cell: (row) => (
                 <div>
@@ -47,12 +49,29 @@ const Transaction = () => {
             name: 'Actions',
             cell: (row) => (
               <div>
-                <button className="btn btn-info btn-custom" onClick={() => console.log('view')}>View</button>
-                <button className="btn btn-warning btn-custom" onClick={() =>console.log('edit')}>Edit</button>
+                <button className="btn btn-danger btn-custom" onClick={ async ()  =>  {
+                  await deleteTransactionHandler(row.id);
+                }}>
+                  <FontAwesomeIcon icon={faTrashAlt} size="xs"/>
+                </button>
               </div>
             ),
           },
     ]
+
+    const deleteTransactionHandler = async (id) =>{
+      try {
+        await sendRequest(
+          process.env.REACT_APP_BACKEND_URL + `/transactions/${id}`,
+          'DELETE',
+          null,
+          {'x-auth-token': auth.token}
+        );
+        setTransactions(transactions.filter(x => x.id !== id));
+        alert('Transaction deleted successfull !!');
+        
+      } catch (err) { console.log(err);}
+    }
 
     useEffect(() => {
         const fetchTransactions = async () => {
