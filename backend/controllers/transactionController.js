@@ -1,7 +1,10 @@
 const httpStatusCode  = require('../constants/httpStatusCode');
+const transHelper = require('../helper/transactionHelper');
 const Transaction = require('../models/Transaction');
-const helper = require('../helper/util');
 const HttpError = require("../models/httpError");
+const helper = require('../helper/util');
+
+const {Op} = require('sequelize');
 
 
 const getAllTransactions = async(req, res, next) => {
@@ -9,6 +12,32 @@ const getAllTransactions = async(req, res, next) => {
     const transactions = await Transaction.findAll({where: {userId}})
     if (!transactions || transactions?.length === 0) return next( new HttpError('No transactions found !!', httpStatusCode.NOT_FOUND));
     res.status(httpStatusCode.OK).json({transactions});
+};
+
+const getMontlyTransactionIncomes = async(req, res, next) => {
+    const userId = req.userData.userId;
+    const currentYear = new Date().getFullYear();
+    let transactions = await Transaction.findAll({where: {userId , isIncome: true }});
+    const filteredTransactions = transactions.filter(x => x.createdAt.getFullYear() === currentYear);
+    
+    if (!filteredTransactions || filteredTransactions?.length === 0) return next( new HttpError('No transactions found !!', httpStatusCode.NOT_FOUND));
+
+    const grouped = transHelper.groupTransactionsByMonth(filteredTransactions);
+
+    res.status(httpStatusCode.OK).json(grouped);
+};
+
+const getMontlyTransactionExpenses = async(req, res, next) => {
+    const userId = req.userData.userId;
+    const currentYear = new Date().getFullYear();
+    let transactions = await Transaction.findAll({where: {userId , isIncome: false }});
+    const filteredTransactions = transactions.filter(x => x.createdAt.getFullYear() === currentYear);
+    
+    if (!filteredTransactions || filteredTransactions?.length === 0) return next( new HttpError('No transactions found !!', httpStatusCode.NOT_FOUND));
+
+    const grouped = transHelper.groupTransactionsByMonth(filteredTransactions);
+
+    res.status(httpStatusCode.OK).json(grouped);
 };
 
 const getTransactionById = async(req, res, next) => {
@@ -29,7 +58,7 @@ const getSummaryTransactions = async(req, res, next) =>{
     if(!inComes || inComes.length !== 0) totalIncomes = inComes.reduce((accumulator, item) => accumulator + item.amount, 0);
     if(!expenses || expenses.length !== 0) totalExpenses = expenses.reduce((accumulator, item) => accumulator + item.amount, 0);
 
-    res.status(httpStatusCode.OK).json({ InComes: totalIncomes, Expenses: totalExpenses, Balance: totalIncomes - totalExpenses});
+    res.status(httpStatusCode.OK).json({ InComes: totalIncomes.toFixed(2), Expenses: totalExpenses.toFixed(2), Balance: (totalIncomes - totalExpenses).toFixed(2)});
 }
 
 const createTransaction = async (req, res, next ) => {
@@ -83,4 +112,13 @@ const deleteTransaction = async (req, res, next) => {
     }
 }
 
-module.exports = { getAllTransactions, getTransactionById, getSummaryTransactions ,createTransaction, updateTransaction, deleteTransaction };
+module.exports = { 
+    getAllTransactions, 
+    getTransactionById, 
+    getSummaryTransactions,
+    createTransaction, 
+    updateTransaction, 
+    deleteTransaction,
+    getMontlyTransactionIncomes,
+    getMontlyTransactionExpenses 
+};
